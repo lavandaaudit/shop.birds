@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CITY.BIRD FAN SHOP | Premium Merch</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --panel: rgba(10, 12, 16, 0.9);
+            --border: rgba(255, 255, 255, 0.1);
+            --accent: #ff9800;
+            --secondary: #00ffcc;
+            --text: #f0f6fc;
+            --text-dim: #8b949e;
+            --glass: blur(40px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            background: rgba(0, 0, 0, 0.95);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 2000;
+        }
+
+        .logo-main {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .logo-sub {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-left: 10px;
+        }
+
+        .cart-trigger {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .cart-trigger:hover {
+            border-color: var(--accent);
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        main {
+            flex: 1;
+            padding: 60px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .hero h1 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 5rem;
+            line-height: 0.9;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            background: #0a0a0a;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .product-info {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-name {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .product-price {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: auto;
+        }
+
+        .buy-btn:hover {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+
+        /* Cart Overlay */
+        #cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 450px;
+            height: 100%;
+            background: var(--panel);
+            backdrop-filter: var(--glass);
+            border-left: 1px solid var(--border);
+            z-index: 3000;
+            padding: 40px;
+            transform: translateX(100%);
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #cart-sidebar.active {
+            transform: translateX(0);
+        }
+
+        .close-cart {
+            cursor: pointer;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            margin-bottom: 30px;
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 30px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .checkout-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .checkout-form input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 10px;
+            color: #fff;
+            outline: none;
+        }
+
+        .checkout-form input:focus {
+            border-color: var(--accent);
+        }
+
+        .submit-order {
+            padding: 18px;
+            background: var(--secondary);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            #cart-sidebar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div style="display:flex; align-items:baseline;">
+            <div class="logo-main">FAN SHOP</div>
+            <div class="logo-sub">CITY.BIRD EDITION</div>
+        </div>
+        <div class="cart-trigger" onclick="toggleCart()">
+            <span id="cart-count">0</span> ПРЕДМЕТІВ
+            <span style="color:var(--accent)">🛒</span>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Premium Civil Merch</h1>
+            <p>Унікальні речі для справжніх поціновувачів міської орнітології. Кожна покупка підтримує проект Bird
+                Radar.</p>
+        </section>
+
+        <div class="product-grid" id="products">
+            <!-- Driven by JS -->
+        </div>
+    </main>
+
+    <div id="cart-sidebar">
+        <div class="close-cart" onclick="toggleCart()">✕ Закрити</div>
+        <h2 style="font-family:'Archivo Black'; margin-bottom:20px; text-transform:uppercase;">Кошик</h2>
+        <div class="cart-items" id="cart-items"></div>
+        <div style="margin-bottom:20px; font-size:1.2rem; font-weight:700;">Разом: <span id="cart-total"
+                style="color:var(--accent)">0</span> грн</div>
+
+        <div class="checkout-form">
+            <input type="text" id="order-name" placeholder="Ваше ім'я">
+            <input type="text" id="order-phone" placeholder="Номер телефону">
+            <input type="text" id="order-address" placeholder="Адреса доставки (Нова Пошта)">
+            <button class="submit-order" onclick="submitOrder()">Оформити замовлення</button>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 1, name: "Футболка", price: 700, img: "1.jpg", desc: "Premium cotton, red IRPIN CITY BIRDS logo." },
+            { id: 2, name: "Реглан", price: 2000, img: "2.jpg", desc: "Heavyweight sweatshirt, urban style branding." },
+            { id: 3, name: "Сумка шопер", price: 500, img: "3.jpg", desc: "Canvas shopper, durable and minimalist." },
+            { id: 4, name: "Годівничка", price: 2000, img: "4.jpg", desc: "Architectural wood feeder, IRPIN CITY BIRDS series." },
+            { id: 5, name: "Кепка", price: 800, img: "5.jpg", desc: "Black snapback with red 3D embroidery." },
+            { id: 6, name: "Чашка", price: 500, img: "6.jpg", desc: "Matte ceramic mug, premium red finish." },
+            { id: 7, name: "Термос", price: 1000, img: "7.jpg", desc: "Metallic vacuum isolation, laser engrave." },
+            { id: 8, name: "Панама", price: 800, img: "8.jpg", desc: "Red bucket hat, urban bird style." }
+        ];
+
+        let cart = [];
+
+        function renderProducts() {
+            const grid = document.getElementById('products');
+            grid.innerHTML = products.map(p => `
+                <div class="product-card">
+                    <img src="${p.img}" class="product-img" onerror="this.src='https://via.placeholder.com/400/111/fff?text=${encodeURIComponent(p.name)}'">
+                    <div class="product-info">
+                        <div class="product-name">${p.name}</div>
+                        <div style="color:var(--text-dim); font-size:0.8rem; margin-bottom:15px;">${p.desc}</div>
+                        <div class="product-price">${p.price} грн</div>
+                        <button class="buy-btn" onclick="addToCart(${p.id})">Замовити</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            const p = products.find(prod => prod.id === id);
+            cart.push(p);
+            updateCart();
+            toggleCart(true); // Open cart on add
+        }
+
+        function updateCart() {
+            document.getElementById('cart-count').innerText = cart.length;
+            const itemContainer = document.getElementById('cart-items');
+            itemContainer.innerHTML = cart.map((p, idx) => `
+                <div class="cart-item">
+                    <span>${p.name}</span>
+                    <span>${p.price} грн</span>
+                    <span style="cursor:pointer; color:var(--accent);" onclick="removeFromCart(${idx})">✕</span>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, p) => sum + p.price, 0);
+            document.getElementById('cart-total').innerText = total;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        function toggleCart(forceOpen = null) {
+            const sidebar = document.getElementById('cart-sidebar');
+            if (forceOpen === true) sidebar.classList.add('active');
+            else if (forceOpen === false) sidebar.classList.remove('active');
+            else sidebar.classList.toggle('active');
+        }
+
+        function submitOrder() {
+            const name = document.getElementById('order-name').value;
+            const phone = document.getElementById('order-phone').value;
+            const address = document.getElementById('order-address').value;
+
+            if (!name || !phone || cart.length === 0) {
+                alert("Заповніть всі дані та додайте товари у кошик!");
+                return;
+            }
+
+            const itemsStr = cart.map(p => `- ${p.name} (${p.price} грн)`).join('\n');
+            const total = cart.reduce((sum, p) => sum + p.price, 0);
+
+            const subject = `Замовлення FAN SHOP: ${name}`;
+            const body = `Нове замовлення від міського орнітолога!\n\nІм'я: ${name}\nТелефон: ${phone}\nАдреса: ${address || 'Не вказана'}\n\nТовари:\n${itemsStr}\n\nРазом: ${total} грн`;
+
+            const mailtoLink = `mailto:2294598@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+            window.location.href = mailtoLink;
+
+            alert(`Дякую, ${name}! Ваше замовлення сформовано. Перевірте поштову програму для відправки листа на 2294598@gmail.com.`);
+
+            cart = [];
+            updateCart();
+            toggleCart(false);
+        }
+
+        window.onload = renderProducts;
+    </script>
+</body>
+
+</html>
