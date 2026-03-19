@@ -370,10 +370,13 @@
             else sidebar.classList.toggle('active');
         }
 
-        function submitOrder() {
+        async function submitOrder() {
             const name = document.getElementById('order-name').value;
             const phone = document.getElementById('order-phone').value;
             const address = document.getElementById('order-address').value;
+
+            // ПОТРІБНО: Вставити сюди ваш URL після налаштування script.gs
+            const GAS_URL = "ВАШ_URL_ТУТ"; 
 
             if (!name || !phone || cart.length === 0) {
                 alert("Заповніть всі дані та додайте товари у кошик!");
@@ -383,18 +386,50 @@
             const itemsStr = cart.map(p => `- ${p.name} (${p.price} грн)`).join('\n');
             const total = cart.reduce((sum, p) => sum + p.price, 0);
 
-            const subject = `Замовлення FAN SHOP: ${name}`;
-            const body = `Нове замовлення від міського орнітолога!\n\nІм'я: ${name}\nТелефон: ${phone}\nАдреса: ${address || 'Не вказана'}\n\nТовари:\n${itemsStr}\n\nРазом: ${total} грн`;
+            const formData = {
+                name: name,
+                phone: phone,
+                address: address || 'Не вказана',
+                items: itemsStr,
+                total: `${total} грн`,
+                _subject: `Замовлення FAN SHOP: ${name}`
+            };
 
-            const mailtoLink = `mailto:2294598@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            const submitBtn = document.querySelector('.submit-order');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Відправка...";
 
-            window.location.href = mailtoLink;
+            try {
+                if (GAS_URL === "ВАШ_URL_ТУТ") {
+                    throw new Error("Будь ласка, вкажіть ваш Google Apps Script URL у змінній GAS_URL.");
+                }
 
-            alert(`Дякую, ${name}! Ваше замовлення сформовано. Перевірте поштову програму для відправки листа на 2294598@gmail.com.`);
+                await fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
 
-            cart = [];
-            updateCart();
-            toggleCart(false);
+                alert(`Дякую, ${name}! Ваше замовлення прийнято автоматично.`);
+                cart = [];
+                updateCart();
+                toggleCart(false);
+                document.getElementById('order-name').value = '';
+                document.getElementById('order-phone').value = '';
+                document.getElementById('order-address').value = '';
+
+            } catch (error) {
+                console.error(error);
+                alert(`Сталася помилка: ${error.message}\nТимчасово відкрито поштову програму...`);
+                
+                const subject = `Замовлення FAN SHOP: ${name}`;
+                const body = `Нове замовлення!\n\nІм'я: ${name}\nТелефон: ${phone}\nАдреса: ${address || 'Не вказана'}\n\nТовари:\n${itemsStr}\n\nРазом: ${total} грн`;
+                window.location.href = `mailto:2294598@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Оформити замовлення";
+            }
         }
 
         window.onload = renderProducts;
